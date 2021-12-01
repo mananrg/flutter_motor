@@ -2,6 +2,8 @@ import 'package:bikes_app/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'login_screen.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 
@@ -70,6 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.initState();
     initial();
   }
+  bool passenable =true;
   late SharedPreferences logindata;
   late String phoneNumber;
   void initial() async {
@@ -217,10 +220,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               width: MediaQuery.of(context).size.width * 0.8,
                               child: TextField(
                                 controller: passwordController,
-                                decoration: const InputDecoration(
+                                obscureText: passenable,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
                                     hintText: "Password",
-                                    border: OutlineInputBorder()),
-                              )),
+                                    suffix: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            //refresh UI
+                                            if (passenable) {
+                                              passenable = false;
+                                            } else {
+                                              passenable = true;
+                                            }
+                                          });
+                                        },
+                                        child: Icon(passenable == true
+                                            ? Icons.remove_red_eye
+                                            : Icons.password,color: Colors.black,),),),
+                              ),),
                         ),
                       ],
                     ),
@@ -255,9 +273,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               emailController.text != '' &&
                               passwordController.text != '' &&
                               _value == true) {
-                            print("11111111111111");
                             logindata.setBool('login', false);
-                            print("22222222222222");
                             logindata.setString(
                                 'phoneNumber', phoneController.text);
                             print("Successfull");
@@ -315,7 +331,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        const SignUpScreen()));
+                                        const LoginScreen()));
                             print("button");
                           },
                           child: const Text(

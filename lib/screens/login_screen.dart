@@ -1,5 +1,8 @@
 import 'package:bikes_app/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -12,10 +15,23 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool passenable = true; //boolean value to track password view enable disable.
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+initial();
+}
+  late SharedPreferences logindata;
+  late String phoneNumber;
+  void initial() async {
+    logindata = await SharedPreferences.getInstance();
+    setState(() {
+      phoneNumber = logindata.getString('phoneNumber');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -24,7 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               // top-image
               Center(
-                  child: Image.asset("assets/images/red_racer.jpg", height: 250)),
+                  child:
+                      Image.asset("assets/images/red_racer.jpg", height: 250)),
               //title-motors
               const Center(
                 child: Padding(
@@ -49,8 +66,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.only(left: 20),
                       child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.8,
-                          child:  TextField(controller: phoneController,
-                            decoration: const InputDecoration(hintText: "Phone"),
+                          child: TextField(
+                            controller: phoneController,
+                            decoration:
+                                const InputDecoration(hintText: "Phone"),
                           )),
                     ),
                   ],
@@ -58,19 +77,35 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               //password input
               Padding(
-                padding: const EdgeInsets.only(left: 10, top: 20),
+                padding: const EdgeInsets.only(left: 10, top: 30),
                 child: Row(
                   children: [
                     const Icon(Icons.lock_outlined),
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          child:  TextField(
-                            obscureText: passenable,
-                            controller: passwordController,
-                            decoration: const InputDecoration(hintText: "Password",),
-                          )),
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        child: TextField(
+                          controller: passwordController,
+                          obscureText: passenable,
+                          decoration: InputDecoration(
+                              hintText: "Password",
+                              suffix: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      //refresh UI
+                                      if (passenable) {
+                                        passenable = false;
+                                      } else {
+                                        passenable = true;
+                                      }
+                                    });
+                                  },
+                                child: Icon(passenable == true
+                                      ? Icons.remove_red_eye
+                                      : Icons.password))),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -83,7 +118,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      if(phoneController.text!='' && passwordController.text!=''){
+                        logindata.setBool('login', false);
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen()));
+                      }
+                    },
                     child: const Padding(
                       padding: EdgeInsets.only(top: 14, bottom: 14),
                       child: Text(
@@ -165,8 +205,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(context,MaterialPageRoute(builder: (context)=>const SignUpScreen()));
-                        print("button");},
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpScreen()));
+                        print("button");
+                      },
                       child: const Text(
                         'Sign Up',
                         style: TextStyle(
@@ -185,4 +229,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
